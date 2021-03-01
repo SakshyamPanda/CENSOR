@@ -6,7 +6,10 @@ from plots import plot, pv_total
 
 # This short code produces the distribution of the present value (PV) of the
 # cost for the first phase of a security breach as well as the value at risk (VaR).
+# in the code we are using u_i instead of Z_i used in the paper.
 
+# u_dist we use two different distributions (of the present value which expresses cyber risk)
+# these are 1) prob dist function and 2) cumulative dist function
 
 # PDF generalised function
 def generalised_PDF(atk_phase,lambda_list,rho,k,u_dist):
@@ -24,7 +27,7 @@ def generalised_PDF(atk_phase,lambda_list,rho,k,u_dist):
     for i in range(atk_phase):
         temp_PDF[i] = ([1/(rho * k) * lambda_product[i] * (j/k)**(lambda_list[i]/rho-1) for j in u_dist])
 
-    PDF = np.sum(temp_PDF, axis=0)
+    PDF = np.sum(temp_PDF, axis=0) # this is the present value for PDF
     return(PDF)
 
 # CDF generalised function
@@ -42,14 +45,14 @@ def generalised_CDF(atk_phase,lambda_list,rho,k,u_dist):
     for i in range(atk_phase):
         temp_CDF[i] = [(j/k)**(lambda_list[i]/rho) * lambda_product[i] for j in u_dist]
 
-    CDF = np.sum(temp_CDF, axis=0)
+    CDF = np.sum(temp_CDF, axis=0) # this is the present value for CDF
     return(CDF)
 
 ##### Parameter Values
-# Discount factor.
+# Discount factor (same notation with the paper).
 rho = 0.3
 
-# Parameter of exponential distribution.
+# Parameter of exponential distribution (same notation with the paper, random values).
 lambda_1 = 2
 lambda_2 = 3
 lambda_3 = 5
@@ -66,10 +69,14 @@ lambda_3 = 5
 # so that
 # k         = A*R*S;
 
-# For now, I simply assume that:
+# For now, I simply assume that (determines the range of PV distribution)
 k_1 = 10
 k_2 = 9
 k_3 = 11
+
+#
+# Creating the range of distribution for the different values.
+#
 
 # The PV cannot exceed the value of k.
 v_1 = np.arange(0.0, k_1, 0.1)
@@ -77,7 +84,7 @@ v_2 = np.arange(0.0, k_2, 0.1)
 v_3 = np.arange(0.0, k_3, 0.1)
 
 
-# Distribution of PV for phase 1 attack
+# Distribution of PV for Phase 1 of the attack
 lambda_list_1 = [lambda_1]
 pv_anPDF_1 = generalised_PDF(1,lambda_list_1,rho,k_1,v_1)
 pv_anCDF_1 = generalised_CDF(1,lambda_list_1,rho,k_1,v_1)
