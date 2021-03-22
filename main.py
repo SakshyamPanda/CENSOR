@@ -2,6 +2,7 @@ import numpy as np
 import scipy.integrate
 from scipy.stats import lognorm
 from plots import plot, pv_total
+from generalisedFunctions import generalised_PDF, generalised_CDF, generalised_PDF_mean
 
 
 # This short code produces the distribution of the present value (PV) of the
@@ -11,43 +12,6 @@ from plots import plot, pv_total
 # u_dist we use two different distributions (of the present value which expresses cyber risk)
 # these are 1) prob dist function and 2) cumulative dist function
 
-# PDF generalised function
-def generalised_PDF(atk_phase,lambda_list,rho,k,u_dist):
-    temp_lambda = np.zeros(shape=(atk_phase,atk_phase))
-    temp_PDF = np.zeros(shape=(atk_phase,len(u_dist)))
-    for i in range(atk_phase):
-        for j in range(atk_phase):
-            if j == i:
-                # print(f'{i}; j-->{j}')
-                temp_lambda[i][j] = lambda_list[i]
-            else:
-                temp_lambda[i][j] = float(lambda_list[j]/(lambda_list[j]-lambda_list[i]))
-
-    lambda_product = np.multiply.reduce(temp_lambda, axis=1)
-    for i in range(atk_phase):
-        temp_PDF[i] = ([1/(rho * k) * lambda_product[i] * (j/k)**(lambda_list[i]/rho-1) for j in u_dist])
-
-    PDF = np.sum(temp_PDF, axis=0) # this is the present value for PDF
-    return(PDF)
-
-# CDF generalised function
-def generalised_CDF(atk_phase,lambda_list,rho,k,u_dist):
-    temp_lambda = np.zeros(shape=(atk_phase,atk_phase))
-    temp_CDF = np.zeros(shape=(atk_phase,len(u_dist)))
-    for i in range(atk_phase):
-        for j in range(atk_phase):
-            if j == i:
-                temp_lambda[i][j] = 1
-            else:
-                temp_lambda[i][j] = float(lambda_list[j]/(lambda_list[j]-lambda_list[i]))
-
-    lambda_product = np.multiply.reduce(temp_lambda, axis=1)
-    for i in range(atk_phase):
-        temp_CDF[i] = [(j/k)**(lambda_list[i]/rho) * lambda_product[i] for j in u_dist]
-
-    CDF = np.sum(temp_CDF, axis=0) # this is the present value for CDF
-    return(CDF)
-
 ##### Parameter Values
 # Discount factor (same notation with the paper).
 rho = 0.3
@@ -56,6 +20,7 @@ rho = 0.3
 lambda_1 = 2
 lambda_2 = 3
 lambda_3 = 5
+lambda_list = [lambda_1, lambda_2, lambda_3]
 
 # In the benchmark case the cost is fixed and assumed equal to 10. According
 # to Eq.(1), k = A.R.S, however, the values of A, R and S are not
@@ -74,20 +39,15 @@ k_1 = 10
 k_2 = 9
 k_3 = 11
 
-#
 # Creating the range of distribution for the different values.
-#
-
 # The PV cannot exceed the value of k.
 v_1 = np.arange(0.0, k_1, 0.1)
 v_2 = np.arange(0.0, k_2, 0.1)
 v_3 = np.arange(0.0, k_3, 0.1)
 
-
 # Distribution of PV for Phase 1 of the attack
-lambda_list_1 = [lambda_1]
-pv_anPDF_1 = generalised_PDF(1,lambda_list_1,rho,k_1,v_1)
-pv_anCDF_1 = generalised_CDF(1,lambda_list_1,rho,k_1,v_1)
+pv_anPDF_1 = generalised_PDF(1,lambda_list,rho,k_1,v_1)
+pv_anCDF_1 = generalised_CDF(1,lambda_list,rho,k_1,v_1)
 
 # Sanity check: integral pf PDF equal to 1
 f = lambda x:(lambda_1/rho * k_1**(-lambda_1/rho) * x**(lambda_1/rho-1))
@@ -101,15 +61,14 @@ tau_1 = np.random.exponential(1/lambda_1,100000)           # sampling tau from a
 tau_11 = np.random.lognormal(0.5,1,100000)                          # sampling tau from an log-normal distribution
 pv_emp_1 = k_1 * np.exp(-rho*tau_1)
 pv_emp_11 = k_1 * np.exp(-rho*tau_11)
-print(f'e1: {pv_emp_1}')
-print(f'e11: {pv_emp_11}')
+# print(f'e1: {pv_emp_1}')
+# print(f'e11: {pv_emp_11}')
 
 
 
 # Distribution of PV for phase 2 attack
-lambda_list_2 = [lambda_1, lambda_2]
-pv_anPDF_2 = generalised_PDF(2,lambda_list_2,rho,k_2,v_2)
-pv_anCDF_2 = generalised_CDF(2,lambda_list_2,rho,k_2,v_2)
+pv_anPDF_2 = generalised_PDF(2,lambda_list,rho,k_2,v_2)
+pv_anCDF_2 = generalised_CDF(2,lambda_list,rho,k_2,v_2)
 
 # Sanity check: integral pf PDF equal to 2
 f = lambda x:(lambda_1*lambda_2/(lambda_2-lambda_1)*1/(k_2*rho)*((x/k_2)**(lambda_1/rho -1)-(x/k_2)**(lambda_2/rho - 1)))
@@ -120,15 +79,13 @@ tau_2 = np.random.exponential(1/lambda_2,100000)           # sampling tau from a
 tau_21 = np.random.lognormal(0.25,1.5,100000)                          # sampling tau from an log-normal distribution
 pv_emp_2 = k_2 * np.exp(-rho*(tau_1+tau_2))
 pv_emp_21 = k_2 * np.exp(-rho*(tau_11+tau_21))
-print(f'e2: {pv_emp_2}')
-print(f'e21: {pv_emp_21}, {tau_21}')
-
+# print(f'e2: {pv_emp_2}')
+# print(f'e21: {pv_emp_21}, {tau_21}')
 
 
 #Distribution of PV for phase 3 attack
-lambda_list_3 = [lambda_1, lambda_2, lambda_3]
-pv_anPDF_3 = generalised_PDF(3,lambda_list_3,rho,k_3,v_3)
-pv_anCDF_3 = generalised_CDF(3,lambda_list_3,rho,k_3,v_3)
+pv_anPDF_3 = generalised_PDF(3,lambda_list,rho,k_3,v_3)
+pv_anCDF_3 = generalised_CDF(3,lambda_list,rho,k_3,v_3)
 
 # Sanity check: integral pf PDF equal to 3
 prod_lambda_3 = lambda_1 * lambda_2 * lambda_3
@@ -143,8 +100,8 @@ tau_3 = np.random.exponential(1/lambda_3,100000)           # sampling tau from a
 tau_31 = np.random.lognormal(1,0.75,100000)                          # sampling tau from an log-normal distribution
 pv_emp_3 = k_2 * np.exp(-rho*(tau_1+tau_2+tau_3))
 pv_emp_31 = k_2 * np.exp(-rho*(tau_11+tau_21+tau_31))
-print(f'e3: {pv_emp_3}')
-print(f'e31: {pv_emp_31}')
+# print(f'e3: {pv_emp_3}')
+# print(f'e31: {pv_emp_31}')
 
 # Total PV
 pv_1 = pv_emp_1 + pv_emp_2 + pv_emp_3
