@@ -48,11 +48,11 @@ def setCoverPlot(subcontrols_list,position,positionCL,positionCH,positionEL,posi
     x = np.arange(len(subcontrols_list))
     y = [0,1,2,3,4,5]
     fig, ax = plt.subplots()
-    ax.scatter(x,no_constraint,s=70,color='steelblue')
-    ax.scatter(x,costL,marker='D',s=60,color='steelblue')
-    ax.scatter(x,costH,marker='X',s=60,color='steelblue')
-    ax.scatter(x,cost_efficacyL,marker='h',s=80,color='steelblue')
-    ax.scatter(x,cost_efficacyH,marker='*',s=90,color='steelblue')
+    ax.scatter(x,no_constraint,s=70,color='black')
+    ax.scatter(x,costL,marker='D',s=60,color='black')
+    ax.scatter(x,costH,marker='X',s=60,color='black')
+    ax.scatter(x,cost_efficacyL,marker='h',s=80,color='black')
+    ax.scatter(x,cost_efficacyH,marker='*',s=90,color='black')
     # plt.axhline(y=1, linestyle=':',color='k',alpha=0.2)
     # plt.axhline(y=2, linestyle=':',color='k',alpha=0.2)
     # plt.axhline(y=3, linestyle=':',color='k',alpha=0.2)
@@ -65,7 +65,7 @@ def setCoverPlot(subcontrols_list,position,positionCL,positionCH,positionEL,posi
     # ax.text(s='Cost and Efficacy\n(Level L)', x=-6, y=3.7)
     # ax.text(s='Cost and Efficacy\n(Level H)', x=-12.2, y=4.7)
     ax.set_yticklabels([0,'A','B','C','D','E'])
-    ax.text(0, -3, "(A) no constraint. (B) budget constraint for subcontrols level L. (C) budget constraint for subcontrols level H. (D) budget and efficacy bound for subcontrols level L. (E) budget and efficacy bound for subcontrols level H.", color='black', wrap=True,
+    ax.text(-1, -3, "(A) no constraint. (B) budget constraint for subcontrols level L. (C) budget constraint for subcontrols level H. (D) budget and efficacy bound for subcontrols level L. (E) budget and efficacy bound for subcontrols level H.", color='black', wrap=True,
         bbox=dict(facecolor='none', edgecolor='black', pad=10.0))
 
     ax.set_xlabel('CIS Subcontrols')
@@ -122,49 +122,6 @@ def setCoverEfficacyBoundPlot(subcontrols_list,efficacy_bound,pos_EL,pos_EH):
     plt.show()
 
 
-def riskPlot(risk_noconstraint,risk_CL,risk_CH,risk_EL,risk_EH,risk_KP):
-    '''ROSI'''
-    rosi = []
-    rosi.append((risk_noconstraint[1]-risk_noconstraint[3]-risk_noconstraint[4])/risk_noconstraint[4])
-    rosi.append((risk_CL[1]-risk_CL[3]-risk_CL[4])/risk_CL[4])
-    rosi.append((risk_CH[1]-risk_CH[3]-risk_CH[4])/risk_CH[4])
-    rosi.append((risk_EL[1]-risk_EL[3]-risk_EL[4])/risk_EL[4])
-    rosi.append((risk_EH[1]-risk_EH[3]-risk_EH[4])/risk_EH[4])
-    rosi.append((risk_KP[1]-risk_KP[3]-risk_KP[4])/risk_KP[4])
-    # df = pd.DataFrame({'eZn^':[risk_noconstraint[3],risk_CL[3],risk_CH[3],risk_EL[3],risk_EH[3]], 'Cost':[risk_noconstraint[4],risk_CL[4],risk_CH[4],risk_EL[4],risk_EH[4]], 'ROSI':rosi})
-    # df1 = pd.DataFrame({'ROSI':rosi})
-    # ax = df1.plot(kind="barh", title="ROSI", color={"Indianred"})
-
-    '''Risk reduction vs cost'''
-    risk_reduction = []
-    risk_reduction.append((risk_noconstraint[1]-risk_noconstraint[3]))
-    risk_reduction.append((risk_CL[1]-risk_CL[3]))
-    risk_reduction.append((risk_CH[1]-risk_CH[3]))
-    risk_reduction.append((risk_EL[1]-risk_EL[3]))
-    risk_reduction.append((risk_EH[1]-risk_EH[3]))
-    risk_reduction.append((risk_KP[1]-risk_KP[3]))
-    cost = [risk_noconstraint[4],risk_CL[4],risk_CH[4],risk_EL[4],risk_EH[4],risk_KP[4]]
-
-    figure, axes = plt.subplots(1, 2)
-    # df = pd.DataFrame({'Residual Risk':risk_reduction})
-    df2 = pd.DataFrame({'Residual Risk':[risk_noconstraint[3],risk_CL[3],risk_CH[3],risk_EL[3],risk_EH[3],risk_KP[3]], 'Reduced Risk':risk_reduction})
-    ax = df2.plot(kind="barh",stacked=True,ax=axes[0],color={"indianred","black"})
-    ax.set_yticklabels(['A','B','C','D','E','F'])
-    ax.text(0, -2.8, "(A) Set cover with no constraint. (B) Set cover with budget constraint for subcontrols level L. (C) Set cover with budget constraint for subcontrols level H. (D) Set cover with budget and efficacy bound for subcontrols level L. (E) Set cover with budget and efficacy bound for subcontrols level H. (F) Knapsack Optimisation with budget", color='black', wrap=True,
-        bbox=dict(facecolor='none', edgecolor='black', pad=10.0))
-
-    df3 = pd.DataFrame({'Cost':cost})
-    ax = df3.plot(kind="barh",ax=axes[1],color={"gray"})
-    ax.set_yticklabels(['A','B','C','D','E','F'])
-    # ax.text(-1.4, -2.8, "(A) Set cover with no constraint. (B) Set cover with budget constraint for subcontrols level L. (C) Set cover with budget constraint for subcontrols level H. (D) Set cover with budget and efficacy bound for subcontrols level L. (E) Set cover with budget and efficacy bound for subcontrols level H. (F) Knapsack Optimisation with budget", color='black', wrap=True,
-        # bbox=dict(facecolor='none', edgecolor='black', pad=10.0))
-    # ax.get_legend().remove()
-
-    plt.show()
-
-
-
-
 def knapsackOptimisationPlot(subcontrols_list,position,levels):
     kp_selection = [float('nan') for x in range(len(subcontrols_list))]
     for (i,j) in zip(position,levels):
@@ -176,7 +133,7 @@ def knapsackOptimisationPlot(subcontrols_list,position,levels):
     x = np.arange(len(subcontrols_list))
     y = [0,1,2]
     fig, ax = plt.subplots()
-    ax.bar(x,kp_selection,color="lightseagreen",alpha=0.6)
+    ax.bar(x,kp_selection,color="lightseagreen",alpha=0.8)
     ax.set_yticks(y)
     ax.set_yticklabels([0,'Level L','Level H'])
     ax.set_xlabel('CIS Subcontrols')
@@ -187,5 +144,77 @@ def knapsackOptimisationPlot(subcontrols_list,position,levels):
     plt.show()
 
 
-def knapsackOptimisationRisk():
-    print('A')
+def riskPlot(risk_noconstraint,risk_CL,risk_CH,risk_EL,risk_EH,risk_KP,budget):
+
+    figure, axes = plt.subplots(1, 3)
+    '''ROSI'''
+    rosi = []
+    rosi.append((risk_noconstraint[1]-risk_noconstraint[3]-risk_noconstraint[4])/risk_noconstraint[4])
+    rosi.append((risk_CL[1]-risk_CL[3]-risk_CL[4])/risk_CL[4])
+    rosi.append((risk_CH[1]-risk_CH[3]-risk_CH[4])/risk_CH[4])
+    rosi.append((risk_EL[1]-risk_EL[3]-risk_EL[4])/risk_EL[4])
+    rosi.append((risk_EH[1]-risk_EH[3]-risk_EH[4])/risk_EH[4])
+    rosi.append((risk_KP[1]-risk_KP[3]-risk_KP[4])/risk_KP[4])
+    # df = pd.DataFrame({'eZn^':[risk_noconstraint[3],risk_CL[3],risk_CH[3],risk_EL[3],risk_EH[3]], 'Cost':[risk_noconstraint[4],risk_CL[4],risk_CH[4],risk_EL[4],risk_EH[4]], 'ROSI':rosi})
+    df1 = pd.DataFrame({'ROSI':rosi})
+    ax = df1.plot(kind="barh",ax=axes[2],color={"steelblue"})
+    ax.set_yticklabels(['A','B','C','D','E','F'])
+
+    '''Risk reduction vs cost'''
+    risk_reduction = []
+    risk_reduction.append((risk_noconstraint[1]-risk_noconstraint[3]))
+    risk_reduction.append((risk_CL[1]-risk_CL[3]))
+    risk_reduction.append((risk_CH[1]-risk_CH[3]))
+    risk_reduction.append((risk_EL[1]-risk_EL[3]))
+    risk_reduction.append((risk_EH[1]-risk_EH[3]))
+    risk_reduction.append((risk_KP[1]-risk_KP[3]))
+    cost = [risk_noconstraint[4],risk_CL[4],risk_CH[4],risk_EL[4],risk_EH[4],risk_KP[4]]
+
+
+    # df = pd.DataFrame({'Residual Risk':risk_reduction})
+    df2 = pd.DataFrame({'Residual Risk':[risk_noconstraint[3],risk_CL[3],risk_CH[3],risk_EL[3],risk_EH[3],risk_KP[3]], 'Reduced Risk':risk_reduction})
+    ax = df2.plot(kind="barh",stacked=True,ax=axes[0],color={"indianred","black"})
+    ax.set_yticklabels(['A','B','C','D','E','F'])
+    ax.text(0, -2.8, "(A) Set cover with no constraint. (B) Set cover with budget constraint for subcontrols level L. (C) Set cover with budget constraint for subcontrols level H. (D) Set cover with budget and efficacy bound for subcontrols level L. (E) Set cover with budget and efficacy bound for subcontrols level H. (F) Knapsack Optimisation with budget", color='black', wrap=True,
+        bbox=dict(facecolor='none', edgecolor='black', pad=10.0))
+
+    df3 = pd.DataFrame({'Cost':cost})
+    ax = df3.plot(kind="barh",ax=axes[1],color={"gray"})
+    ax.axvline(x=budget, linestyle=':',color='k',alpha=0.2,label='Budget'+str(budget))
+    ax.set_yticklabels(['A','B','C','D','E','F'])
+    ax.set_xlabel('Budget='+str(budget))
+    # ax.text(budget-10,-0.8,budget)
+    # ax.text(-1.4, -2.8, "(A) Set cover with no constraint. (B) Set cover with budget constraint for subcontrols level L. (C) Set cover with budget constraint for subcontrols level H. (D) Set cover with budget and efficacy bound for subcontrols level L. (E) Set cover with budget and efficacy bound for subcontrols level H. (F) Knapsack Optimisation with budget", color='black', wrap=True,
+        # bbox=dict(facecolor='none', edgecolor='black', pad=10.0))
+    ax.get_legend()
+    plt.legend(loc='best')
+
+    plt.show()
+
+
+def knapsackRiskPlot(risk_KP_list,budget_list):
+    eZn = []
+    eZn_cap = []
+    cost = []
+    rosi = []
+    reduced_risk = []
+    for i in risk_KP_list:
+        eZn.append(i[1])
+        eZn_cap.append(i[3])
+        cost.append(i[4])
+        rosi.append((i[1]-i[3]-i[4])/i[4])
+        reduced_risk.append(i[1]-i[3])
+
+    print(f'eZn_cap:{eZn_cap}')
+    print(f'rosi:{rosi}')
+
+    # df = pd.DataFrame({'eZn_cap':eZn_cap})
+    # ax = df.plot.line(color={"indianred"})
+    # plt.plot(budget_list,eZn_cap,color='indianred',label='residual')
+    plt.plot(budget_list,rosi,color='steelblue',label='rosi')
+    plt.plot(budget_list,reduced_risk,color='black',label='reduced risk')
+    plt.xlabel('Budget')
+
+    # fig.tight_layout()
+    plt.legend(loc='best')
+    plt.show()

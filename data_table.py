@@ -50,7 +50,7 @@ def control_efficacy_table():
         for col in list(data.columns):
             if col != 'CWE' and col != 'Rank':
                 eff1 = round(random.uniform(0.45,0.9),3)
-                eff2 = round(random.uniform(0.01,eff1),3)
+                eff2 = round(random.uniform(0.1,eff1-0.05),3)
                 efficacy_data.loc[i,str(col)+'_L'] = eff2
                 efficacy_data.loc[i,str(col)+'_H'] = eff1
     efficacy_data.to_csv(r'data/control_efficacy_table.csv', index=False)
@@ -62,8 +62,8 @@ def control_cost_table():
     data = data.drop(['Rank','CWE'], axis=1)
     cost_data = pd.DataFrame([])
     for col in range(0,len(data.columns),2):
-        costH = round(random.uniform(1,100),2)
-        costL = round(random.uniform(1,costH),2)
+        costH = round(random.uniform(600,1000),2)
+        costL = round(random.uniform(500,costH),2)
         cost_data.loc[1,data.columns[col]] = costL
         cost_data.loc[1,data.columns[col+1]] = costH
     cost_data.to_csv(r'data/control_cost_table.csv', index=False)
@@ -76,4 +76,4 @@ if __name__ == "__main__":
     ''' Should comment out after first generation else '''
     ''' will create new efficacy and cost for each simulation '''
     # control_efficacy_table()
-    # control_cost_table()
+    control_cost_table()
