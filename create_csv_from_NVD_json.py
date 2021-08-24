@@ -12,17 +12,11 @@ def filter_data(data,num):
         if len(i['impact']) != 0:
             for j in range(len(i['cve']['problemtype']['problemtype_data'][0]['description'])):
                 total_cwe.add(i['cve']['problemtype']['problemtype_data'][0]['description'][j]['value'])
-                # if i['cve']['problemtype']['problemtype_data'][0]['description'][j]['value'] in CWE_2020:
-                    # print(i['cve']['CVE_data_meta']['ID'])
-                    # print(f"{i['cve']['problemtype']['problemtype_data'][0]['description'][j]['value']}, {i['cve']['CVE_data_meta']['ID']},{i['impact']['baseMetricV2']['cvssV2']['baseScore']},{i['impact']['baseMetricV2']['severity']}, {i['impact']['baseMetricV2']['exploitabilityScore']}, {i['impact']['baseMetricV3']['cvssV3']['baseScore']}, {i['impact']['baseMetricV3']['cvssV3']['baseSeverity']}, {i['impact']['baseMetricV3']['exploitabilityScore']}")
                 temp.append([i['cve']['problemtype']['problemtype_data'][0]['description'][j]['value'],
                     i['cve']['CVE_data_meta']['ID'], i['impact']['baseMetricV3']['cvssV3']['baseScore'],
                     i['impact']['baseMetricV3']['exploitabilityScore'], i['impact']['baseMetricV3']['cvssV3']['attackComplexity'],
                     i['impact']['baseMetricV3']['cvssV3']['privilegesRequired'], i['impact']['baseMetricV3']['cvssV3']['userInteraction']])
 
-                    # i['impact']['baseMetricV2']['cvssV2']['baseScore'], i['impact']['baseMetricV2']['exploitabilityScore'], i['impact']['baseMetricV2']['cvssV2']['accessComplexity'],
-
-    # print(json.dumps(data['CVE_Items'][15753], sort_keys=True, indent=4, separators=(',',':')))
     df = pd.DataFrame(temp)
     df.columns = ['CWE', 'CVE', 'CVSS_V3_baseScore', 'CVSS_V3_exploitabilityScore', 'CVSS_V3_attackComplexity', 'CVSS_V3_privilegesRequired', 'CVSS_V3_userInteraction']
     df.to_csv('data/nvd'+num+'.csv')

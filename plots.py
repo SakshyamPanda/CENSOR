@@ -7,22 +7,27 @@ plt.style.use('ggplot')
 # from sklearn import preprocessing
 # import seaborn as sns
 
-def plot(v,pv_anPDF,pv_anCDF,pv_emp_exp,pv_emp_log,phase):
-    plt.hist(pv_emp_exp,bins=100,density=1,color='blue',alpha=0.6,label='Simulated PDF (exponential)')
-    # sns.distplot(pv_emp, hist=True, kde=False, bins=100, norm_hist=True)
-    plt.plot(v,pv_anPDF,'r--',label='Analytical PDF (exponential)')
-    plt.plot(v,pv_anCDF,'k:',label='Analytical CDF (exponential)')
-    plt.hist(pv_emp_log,bins=100,density=1,color='green',alpha=0.7,label='Simulated PDF (log-norm)')
-    plt.xlabel('Present Value '+ '('+phase+')')
+# def plot(v,pv_anPDF,pv_anCDF,pv_emp_exp,pv_emp_log,phase):
+def plot(v,pv_anPDF,pv_emp_exp,pv_emp_exp_95,phase):
+    print(pv_emp_exp_95)
+    plt.hist(pv_emp_exp,bins=100,density=True,color='mediumseagreen',alpha=1,label='Simulated PDF')
+    # sns.distplot(pv_emp_exp, hist=True, kde=False, bins=100, norm_hist=True)
+    plt.plot(v,pv_anPDF,color='darkred',linestyle='dashed',label='Analytical PDF')
+    # plt.plot(v,pv_anCDF,'k:',label='Analytical CDF (exponential)')
+    # plt.hist(pv_emp_log,bins=100,density=1,color='green',alpha=0.7,label='Simulated PDF (log-norm)')
+    plt.axvline(x=pv_emp_exp_95,color='k',label='95% = £{}'.format(pv_emp_exp_95))
+    plt.xlabel('Present Value £ '+ '('+phase+')')
     plt.ylabel('Frequency')
-    plt.legend(loc='best')
+    plt.legend(loc='best',fontsize=11)
+    # fig.tight_layout()
     plt.show()
 
 
-def pv_total(pv1,pv2,phase):
+def pv_total(pv1,pv2,pv_95,phase):
     plt.hist(pv1,bins=100,density=1,color='blue',alpha=0.6,label='Simulated PDF (exponential)')
     plt.hist(pv2,bins=100,density=1,color='green',alpha=0.7,label='Simulated PDF (log-norm)')
-    plt.xlabel('Present Value '+ '('+phase+')')
+    plt.axvline(x=pv_95,color='k',label='95% = £{}'.format(pv_95))
+    plt.xlabel('Present Value £ '+ '('+phase+')')
     plt.ylabel('Frequency')
     plt.legend(loc='best')
     plt.show()
@@ -159,6 +164,9 @@ def riskPlot(risk_noconstraint,risk_CL,risk_CH,risk_EL,risk_EH,risk_KP,budget):
     df1 = pd.DataFrame({'ROSI':rosi})
     ax = df1.plot(kind="barh",ax=axes[2],color={"steelblue"})
     ax.set_yticklabels(['A','B','C','D','E','F'])
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0 + box.height * 0.2, box.width, box.height * 0.8])
+    ax.legend(loc='upper center',bbox_to_anchor=(0.5,-0.09),fancybox=True,shadow=True,ncol=1,prop={'size': 9})
 
     '''Risk reduction vs cost'''
     risk_reduction = []
@@ -172,22 +180,30 @@ def riskPlot(risk_noconstraint,risk_CL,risk_CH,risk_EL,risk_EH,risk_KP,budget):
 
 
     # df = pd.DataFrame({'Residual Risk':risk_reduction})
-    df2 = pd.DataFrame({'Residual Risk':[risk_noconstraint[3],risk_CL[3],risk_CH[3],risk_EL[3],risk_EH[3],risk_KP[3]], 'Reduced Risk':risk_reduction})
+    df2 = pd.DataFrame({'Residual Expected Impact':[risk_noconstraint[3],risk_CL[3],risk_CH[3],risk_EL[3],risk_EH[3],risk_KP[3]], 'Reduced Expected Impact':risk_reduction})
     ax = df2.plot(kind="barh",stacked=True,ax=axes[0],color={"indianred","black"})
     ax.set_yticklabels(['A','B','C','D','E','F'])
-    ax.text(0, -2.8, "(A) Set cover with no constraint. (B) Set cover with budget constraint for subcontrols level L. (C) Set cover with budget constraint for subcontrols level H. (D) Set cover with budget and efficacy bound for subcontrols level L. (E) Set cover with budget and efficacy bound for subcontrols level H. (F) Knapsack Optimisation with budget", color='black', wrap=True,
-        bbox=dict(facecolor='none', edgecolor='black', pad=10.0))
+    ax.text(0, -3.5, "(A) Set cover with no constraint. (B) Set cover with budget constraint for subcontrols level L. (C) Set cover with budget constraint for subcontrols level H. (D) Set cover with budget and efficacy bound for subcontrols level L. (E) Set cover with budget and efficacy bound for subcontrols level H. (F) Knapsack Optimisation with budget", color='black', wrap=True,
+        bbox=dict(facecolor='none', edgecolor='black', pad=5.0), fontsize=10)
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0 + box.height * 0.2, box.width, box.height * 0.8])
+
+    # Put a legend below current axis
+    ax.legend(loc='upper center',bbox_to_anchor=(0.5,-0.09),fancybox=True,shadow=True,ncol=1,prop={'size': 9})
 
     df3 = pd.DataFrame({'Cost':cost})
     ax = df3.plot(kind="barh",ax=axes[1],color={"gray"})
-    ax.axvline(x=budget, linestyle=':',color='k',alpha=0.2,label='Budget'+str(budget))
+    ax.axvline(x=budget, linestyle=':',color='k',alpha=0.2,label='Budget = £'+str(budget))
     ax.set_yticklabels(['A','B','C','D','E','F'])
-    ax.set_xlabel('Budget='+str(budget))
+    # ax.set_xlabel('Budget='+str(budget),fontsize=10)
     # ax.text(budget-10,-0.8,budget)
     # ax.text(-1.4, -2.8, "(A) Set cover with no constraint. (B) Set cover with budget constraint for subcontrols level L. (C) Set cover with budget constraint for subcontrols level H. (D) Set cover with budget and efficacy bound for subcontrols level L. (E) Set cover with budget and efficacy bound for subcontrols level H. (F) Knapsack Optimisation with budget", color='black', wrap=True,
         # bbox=dict(facecolor='none', edgecolor='black', pad=10.0))
-    ax.get_legend()
-    plt.legend(loc='best')
+    # ax.get_legend()
+    # plt.legend()
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0 + box.height * 0.2, box.width, box.height * 0.8])
+    ax.legend(loc='upper center',bbox_to_anchor=(0.5,-0.09),fancybox=True,shadow=True,ncol=1,prop={'size': 9})
 
     plt.show()
 
@@ -212,7 +228,7 @@ def knapsackRiskPlot(risk_KP_list,budget_list):
     # ax = df.plot.line(color={"indianred"})
     # plt.plot(budget_list,eZn_cap,color='indianred',label='residual')
     plt.plot(budget_list,rosi,color='steelblue',label='rosi')
-    plt.plot(budget_list,reduced_risk,color='black',label='reduced risk')
+    plt.plot(budget_list,reduced_risk,color='black',label='Reduced Expected Impact')
     plt.xlabel('Budget')
 
     # fig.tight_layout()

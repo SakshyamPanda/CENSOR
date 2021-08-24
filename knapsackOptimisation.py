@@ -3,6 +3,7 @@ import numpy as np
 import itertools
 import json
 import math
+from pdf_calculation import PDFCalculation
 
 def dynamicKnapsack(controls_pair,cost_matrix,eff_prod,budget):
     n = len(controls_pair)
@@ -49,8 +50,7 @@ def dynamicKnapsack(controls_pair,cost_matrix,eff_prod,budget):
     print(f'total cost:{sum(total_cost)}----{total_cost}')
     return(sol,total_cost)
 
-def expectedZn(Ai,RiSi,time_list,rho):
-    lambda_list = [1/i for i in time_list]
+def expectedZn(Ai,RiSi,lambda_list,rho):
     n = len(Ai)
     coeff = []
     Zn = []
@@ -111,20 +111,16 @@ def Zn_data(cwe_table,selection_name,efficacy_table,budget,rho,Ai):
             RiSi_cap.append(round(np.inner(Ri[i],Si_cap[i]),5))
             time_list.append(round(cwe_layer[i]['Avg_CVSS_V3_time'].mean(),5))
 
-        # print(f'cwe_layer:{cwe_layer}')
-        # print(f'Si: {Si}')
-        # print(f'sel_prod: {selection_eff_product}')
-        # print(f'Si_cap: {Si_cap}')
-        # print(f'RiSi:{RiSi}')
-        # print(f'RiSi_cap:{RiSi_cap}')
-
-        Zn, eZn = expectedZn(Ai,RiSi,time_list,rho)
-        Zn_cap, eZn_cap = expectedZn(Ai,RiSi_cap,time_list,rho)
+        lambda_list = [1/i for i in time_list]
+        Zn, eZn = expectedZn(Ai,RiSi,lambda_list,rho)
+        Zn_cap, eZn_cap = expectedZn(Ai,RiSi_cap,lambda_list,rho)
         Zn_agg.append(sum(Zn))
         eZn_agg.append(sum(eZn))
         Zn_cap_agg.append(sum(Zn_cap))
         eZn_cap_agg.append(sum(eZn_cap))
 
+    # Calculating PDF
+    PDFCalculation(lambda_list,rho,eZn_cap)
     return(Zn_agg,eZn_agg,Zn_cap_agg,eZn_cap_agg)
 
 
@@ -162,7 +158,8 @@ def knapsackOptimisation(cwetable,efficacy_table,cost_table,mapping_table,budget
     print(f'selection_name:{selection_name}')
     Zn_agg,eZn_agg,Zn_cap_agg,eZn_cap_agg = Zn_data(cwe_table,selection_name,efficacy_table,budget,rho,Ai)
 
-    print(f'Total val: eZn{np.mean(eZn_agg)} - total cost({sum(costs)}) = {np.mean(eZn_agg) - sum(costs)}')
-    print(f'Total val: eZn_cap{np.mean(eZn_cap_agg)} - total cost({sum(costs)}) = {np.mean(eZn_cap_agg) - sum(costs)}')
+    # Mean of Zn and eZn is required if we run more than 1 iterations
+    print(f'Total val: eZn {eZn_agg},{np.mean(eZn_agg)} - total cost({sum(costs)}) = {np.mean(eZn_agg) - sum(costs)}')
+    print(f'Total val: eZn_cap {eZn_cap_agg},{np.mean(eZn_cap_agg)} - total cost({sum(costs)}) = {np.mean(eZn_cap_agg) - sum(costs)}')
 
     return(subcontrols_selected,subcontrols_level,sum(costs),np.mean(Zn_agg),np.mean(eZn_agg),np.mean(Zn_cap_agg),np.mean(eZn_cap_agg))

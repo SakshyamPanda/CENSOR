@@ -80,8 +80,6 @@ def setCoverCost(sets,universe,budget,weights):
         time.sleep(1)
 
     res = [i for set_i in cover for i in set_i]
-    # print(f'cover:{cover}')
-    # print(f'res:{np.unique(res)}')
 
     if len(np.unique(res)) == len(universe):
         print(f'SCC: cover={cover}---{sum(costs)},{costs}----{pos}')
